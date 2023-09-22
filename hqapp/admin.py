@@ -52,4 +52,4 @@ class LessonAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = "name",
+    list_display = "name", "product"
