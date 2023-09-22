@@ -57,6 +57,7 @@ class Student(models.Model):
     ]
 
     name = models.CharField(max_length=250, verbose_name="name")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product")
 
     def __str__(self)-> str:
         return f"{self.name}"
