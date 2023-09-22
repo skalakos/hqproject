@@ -5,6 +5,7 @@ from hqapp.models import (
     Lesson,
     Product,
     Student,
+    ProductWithStudent,
 )
 
 
@@ -24,15 +25,15 @@ class AuthorAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
 
     list_display_links = "pk", "product_name",
-    list_display = "pk", "author", "product_name", "lessons", "count"
+    list_display = "pk", "author", "product_name", "lessons", "count_lessons"
     ordering = "pk",
 
-    def count(self, obj):
-        result = Lesson.objects.filter(product=obj).aggregate(Count("product"))
-        return result["product__count"]
+    def count_lessons(self, obj):
+        result = Lesson.objects.filter(lesson=obj).aggregate(Count("lesson"))
+        return result["lesson__count"]
 
     def lessons(self, obj):
-        result = Lesson.objects.filter(product=obj).prefetch_related("product")
+        result = Lesson.objects.filter(lesson=obj).prefetch_related("lesson")
         return [i_lesson for i_lesson in result]
 
 
@@ -50,6 +51,28 @@ class LessonAdmin(admin.ModelAdmin):
     list_display_links = "pk", "title",
 
 
+class ProductStudentInLine(admin.TabularInline):
+    model = ProductWithStudent
+
+#
+# class LessonStudentInLine(admin.TabularInline):
+#     model = Student.lessons.through
+
+
 @admin.register(Student)
-class LessonAdmin(admin.ModelAdmin):
-    list_display = "name", "product"
+class StudentAdmin(admin.ModelAdmin):
+    inlines = [
+        ProductStudentInLine,
+        # LessonStudentInLine
+    ]
+
+    list_display = "pk", "name", "products", "lessons_for_student"
+    ordering = "pk",
+
+    def products(self, obj) -> str:
+        result = Product.objects.filter(products=obj).aggregate(Count("products"))
+        return result['products__count']
+
+    def lessons_for_student(self, obj):
+        result = Lesson.objects.filter(lesson=obj).prefetch_related("lesson")
+        return [i_lesson for i_lesson in result]
