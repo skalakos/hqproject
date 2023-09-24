@@ -17,16 +17,9 @@ class Author(models.Model):
 class Lesson(models.Model):
     """Модель урока"""
 
-    STATUS_VIDEO = [
-        ("True", "true"),
-        ("False ", "false"),
-    ]
-
     title = models.CharField(max_length=200, verbose_name="title")
     link = models.URLField(max_length=360, verbose_name="link")
     video_time = models.PositiveIntegerField()
-    status = models.CharField(choices=STATUS_VIDEO, max_length=30, default="false")
-    # product = models.ManyToManyField(Product, related_name="lessons")
 
     def __str__(self) -> str:
         return f" {self.title}"
@@ -52,22 +45,23 @@ class Product(models.Model):
 class Student(models.Model):
     """Модель ученика"""
 
-    STATUS_VIDEO = [
-        ("True", "true"),
-        ("False ", "false"),
-    ]
-
     name = models.CharField(max_length=250, verbose_name="name")
     products = models.ManyToManyField(Product, related_name="products")
-    # view_status = models.CharField(choices=STATUS_VIDEO, max_length=32, blank=True)
-
 
     def __str__(self) -> str:
         return f"{self.name}"
 
 
-class ProductWithStudent(models.Model):
+class LessonViewed(models.Model):
     """Модель описывающая отношение продукта к ученику"""
 
+    STATUS_VIDEO = [
+        ("True", "true"),
+        ("False ", "false"),
+    ]
+
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="student")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product")
+    # product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product")
+    lessons = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="lessons")
+    viewed = models.CharField(choices=STATUS_VIDEO, max_length=32, default="false")
+    viewed_time = models.PositiveIntegerField()
